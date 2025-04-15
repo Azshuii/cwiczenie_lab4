@@ -1,0 +1,47 @@
+
+zad 1
+
+zad 2 
+#!/bin/bash
+
+# Flagi długie i krótkie
+case "$1" in
+    --date|-d)
+        date
+        ;;
+    --logs|-l)
+        num=${2:-100}
+        for i in $(seq 1 $num); do
+            echo "log$i.txt - skrypt.sh - $(date)" > "log$i.txt"
+        done
+        ;;
+    --error|-e)
+        num=${2:-100}
+        for i in $(seq 1 $num); do
+            echo "error$i.txt - skrypt.sh - $(date)" > "error$i.txt"
+        done
+        ;;
+    --init)
+        repo_url=$(git config --get remote.origin.url)
+        if [ -z "$repo_url" ]; then
+            echo "Nie znaleziono zdalnego repozytorium."
+            exit 1
+        fi
+        dir_name=$(basename "$repo_url" .git)
+        git clone "$repo_url" "$PWD/$dir_name"
+        echo "export PATH=\"$PWD/$dir_name:\$PATH\"" >> ~/.bashrc
+        source ~/.bashrc
+        echo "Repozytorium sklonowane do $PWD/$dir_name i dodane do PATH"
+        ;;
+    --help|-h)
+        echo "Dostępne opcje:"
+        echo "--date, -d        Wyświetla dzisiejszą datę"
+        echo "--logs [N], -l N  Tworzy N plików logx.txt (domyślnie 100)"
+        echo "--error [N], -e N Tworzy N plików errorx.txt (domyślnie 100)"
+        echo "--init            Klonuje repozytorium i dodaje jego ścieżkę do PATH"
+        echo "--help, -h        Pokazuje tę pomoc"
+        ;;
+    *)
+        echo "Nieznana opcja. Użyj --help lub -h"
+        ;;
+esac
